@@ -8,6 +8,7 @@ import (
 func init() {
 	fmt.Println("initialize configuration")
 	viper.AddConfigPath("conf")
+	viper.AddConfigPath(".")
 	viper.SetConfigType("yaml")
 	setDefault()
 	if err := viper.ReadInConfig(); err != nil {
