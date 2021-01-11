@@ -63,7 +63,7 @@ func GetAll() ([]model.IP, error) {
 }
 
 // 获取到文档
-func GetLimit(limit int64) ([]model.IP, error) {
+func GetLimit(limit int64, filter interface{}, sort interface{}) ([]model.IP, error) {
 	if limit <=0{
 		return nil, nil
 	}
@@ -73,9 +73,11 @@ func GetLimit(limit int64) ([]model.IP, error) {
 
 	opt := &options.FindOptions{
 		Limit: &limit,
+		Sort: sort,
 	}
 
-	cursor, err := MongoDB.Find(ctx, bson.M{}, opt)
+
+	cursor, err := MongoDB.Find(ctx, filter, opt)
 	if err != nil {
 		return nil, err
 	}
@@ -135,4 +137,11 @@ func ExistIP(ipaddr string) bool {
 		return true
 	}
 	return false
+}
+
+func Update(filter interface{}, update interface{}, option... *options.UpdateOptions) error{
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+	_, err :=  MongoDB.UpdateOne(ctx, filter, update, option...)
+	return err
 }
