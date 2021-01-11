@@ -27,7 +27,7 @@ type param struct {
 
 使用`Postman`测试如下
 
-![image-20210111163652209](images/1.png)
+<img src="images/1.png" width=500>
 
 > :star:**强烈建立在使用的时候参数在上述的sort和filter参数进行扩展，以免获取到的IP可用率比较低**
 
@@ -48,7 +48,7 @@ database:
 
 # 日志配置
 log:
-  mode: "console"  # 或者 file，只有设置mode为file的时候filename才生效
+  mode: "console"  # console 或者 file，只有设置mode为file的时候filename才生效
   level: "info" # 或者 debug, trace, warning, error
   filename: "proxy.log" # 日志文件名
   max-size: 5  # MB为单位，当文件达到这个大小之后更换另一个日志文件，暂无实现
@@ -67,6 +67,12 @@ api:
 
 如果需要使用二进制文件比如`proxy_server.exe`，请在与`proxy_server.exe`同目录下新建一个上述格式的配置文件，命名必须为`config.yaml`
 
-如下图格式
+如下图格式，然后在当前目录下运行`proxy_server.exe`即可
 
-![image-20210111165602085](D:\Documents\Go\IPProxy\images\2.png)
+<img src="images/2.png" width=400>
+
+
+
+#### LICENSE
+
+开源免费使用，本人不承担任何因此造成的法律责任
