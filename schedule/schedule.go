@@ -2,6 +2,7 @@ package schedule
 
 import (
 	"github.com/go-co-op/gocron"
+	"github.com/junhaideng/IPProxy/check"
 	"github.com/junhaideng/IPProxy/spider"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
@@ -52,6 +53,15 @@ func (p *ProxySchedule) Start() error {
 			}).Errorf("start number %d spider error", index)
 		}
 	}
+
+	// 每interval*len(spiders)分钟进行另一次ip的检测
+	_, err := p.s.Every(interval*uint64(len(p.spiders))).Minute().Do(check.CheckIP)
+	if err != nil{
+		logrus.WithFields(logrus.Fields{
+			"err": err,
+		}).Error("check ip err")
+	}
+
 	// 开启任务
 	p.s.StartAsync()
 	return nil
