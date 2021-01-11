@@ -2,6 +2,7 @@ package check
 
 import (
 	"github.com/junhaideng/IPProxy/model"
+	"sync"
 	"testing"
 )
 
@@ -10,7 +11,8 @@ func TestCheckIP(t *testing.T) {
 		IP:   "223.82.106.253",
 		Port: "3128",
 	}
-	if !check(ip) {
-		t.Fatal("not pass")
-	}
+	var wg sync.WaitGroup
+	wg.Add(1)
+	go CheckSingleIP(ip, &wg)
+	wg.Wait()
 }
