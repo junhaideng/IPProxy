@@ -10,7 +10,7 @@ import (
 	"time"
 )
 
-func SpiderJiangXianLi()[]model.IP {
+func SpiderJiangXianLi() []model.IP {
 	var ips []model.IP
 	c := colly.NewCollector()
 
@@ -32,46 +32,46 @@ func SpiderJiangXianLi()[]model.IP {
 				return true
 			})
 			t, err := time.Parse("2006-01-02 15:04:05", info[9])
-			if err != nil{
+			if err != nil {
 				logrus.WithFields(logrus.Fields{
-					"err": err,
+					"err":  err,
 					"time": info[9],
-					"url": url,
+					"url":  url,
 				}).Error("parse time error")
 				return
 			}
 			var speed time.Duration
-			temp_index := strings.Index(info[7], "毫秒")
-			if temp_index > -1 {
-				s, err := strconv.Atoi(info[7][:temp_index])
-				if err != nil{
+			tempIndex := strings.Index(info[7], "毫秒")
+			if tempIndex > -1 {
+				s, err := strconv.Atoi(info[7][:tempIndex])
+				if err != nil {
 					logrus.WithFields(logrus.Fields{
-						"err": err,
+						"err":           err,
 						"response-time": info[7],
-						"url": url,
-						"type": "millisecond",
+						"url":           url,
+						"type":          "millisecond",
 					}).Error("parse response time error")
 					return
 				}
 				speed = time.Millisecond * time.Duration(s)
-			}else {
-				index := strings.Index(info[7],"秒")
+			} else {
+				index := strings.Index(info[7], "秒")
 				if index > -1 {
 					s, err := strconv.ParseFloat(info[7][:index], 64)
-					if err != nil{
+					if err != nil {
 						logrus.WithFields(logrus.Fields{
-							"err": err,
+							"err":           err,
 							"response-time": info[7],
-							"url": url,
-							"type": "second",
+							"url":           url,
+							"type":          "second",
 						}).Error("parse response time error")
 						return
 					}
 					speed = time.Millisecond * time.Duration(s*1000)
-				}else{
+				} else {
 					logrus.WithFields(logrus.Fields{
 						"response-time": info[7],
-						"url": url,
+						"url":           url,
 					}).Error("can not parse response time")
 					return
 				}
@@ -82,7 +82,7 @@ func SpiderJiangXianLi()[]model.IP {
 				Anonymous:     info[2],
 				Location:      info[4],
 				VerifyTime:    t,
-				Type:          info[3],
+				Type:          strings.ToLower(info[3]),
 				POST:          true,
 				ResponseSpeed: speed,
 			})
@@ -92,8 +92,7 @@ func SpiderJiangXianLi()[]model.IP {
 		c.Visit(fmt.Sprintf(url, pageNum))
 	})
 
-	 c.Visit(fmt.Sprintf(url, pageNum))
+	c.Visit(fmt.Sprintf(url, pageNum))
 
 	return ips
 }
-

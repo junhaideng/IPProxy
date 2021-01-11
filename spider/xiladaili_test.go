@@ -4,6 +4,6 @@ import (
 	"testing"
 )
 
-func TestXiLaDaiLi(t *testing.T){
+func TestXiLaDaiLi(t *testing.T) {
 	SpiderXiLaDaiLi()
 }

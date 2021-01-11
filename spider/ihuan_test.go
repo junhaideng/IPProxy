@@ -4,6 +4,6 @@ import (
 	"testing"
 )
 
-func Test(t *testing.T){
+func Test(t *testing.T) {
 	SpiderIHuan()
 }

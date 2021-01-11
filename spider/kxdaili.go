@@ -12,8 +12,7 @@ import (
 	"time"
 )
 
-
-func SpiderKxDaiLi() []model.IP{
+func SpiderKxDaiLi() []model.IP {
 
 	var ips []model.IP
 	var url = "http://www.kxdaili.com/dailiip/%d/%d.html"
@@ -30,21 +29,21 @@ func SpiderKxDaiLi() []model.IP{
 			})
 			temp := strings.Split(info[4], " ")[0]
 			speed, err := strconv.ParseFloat(temp, 64)
-			if err != nil{
+			if err != nil {
 				logrus.WithFields(logrus.Fields{
-					"err": err,
+					"err":           err,
 					"response-time": info[4],
-					"url": url,
+					"url":           url,
 				}).Error("parse response time error")
 				return
 			}
 
 			t, err := parseTime(info[6])
-			if err != nil{
+			if err != nil {
 				logrus.WithFields(logrus.Fields{
-					"err": err,
+					"err":  err,
 					"time": info[6],
-					"url": url,
+					"url":  url,
 				}).Error("parse time error")
 				return
 			}
@@ -55,12 +54,12 @@ func SpiderKxDaiLi() []model.IP{
 				Anonymous:     info[2],
 				Location:      info[5],
 				VerifyTime:    time.Now().Add(-t),
-				Type:          info[3],
+				Type:          strings.ToLower(info[3]),
 				POST:          true,
 				ResponseSpeed: time.Millisecond * time.Duration(speed*1000),
 			})
 		})
-		page ++
+		page++
 		c.Visit(fmt.Sprintf(url, 0, page))
 		c.Visit(fmt.Sprintf(url, 1, page))
 
@@ -73,10 +72,11 @@ func SpiderKxDaiLi() []model.IP{
 
 	return ips
 }
+
 // parse time, ignore some case
 // (time.Duration, error)
 func parseTime(s string) (time.Duration, error) {
-	var ERR =  errors.New("parse time error, maybe just some ignored case")
+	var ERR = errors.New("parse time error, maybe just some ignored case")
 	var t time.Duration
 	var reg1 = regexp.MustCompile(`(\d+)天(\d+)小时前`)
 	var reg2 = regexp.MustCompile(`(\d+)小时(\d+)分前`)
@@ -87,46 +87,46 @@ func parseTime(s string) (time.Duration, error) {
 		match := reg1.FindStringSubmatch(s)
 		if len(match) == 3 {
 			day, err := strconv.Atoi(match[1])
-			if err != nil{
+			if err != nil {
 				return 0, err
 			}
 			hour, err := strconv.Atoi(match[2])
-			if err != nil{
+			if err != nil {
 				return 0, err
 			}
-			t = time.Hour * 24 * time.Duration(day) + time.Hour * time.Duration(hour)
+			t = time.Hour*24*time.Duration(day) + time.Hour*time.Duration(hour)
 			return t, nil
 		}
 		return 0, ERR
 
-	}else if hourIndex > -1 {
+	} else if hourIndex > -1 {
 		match := reg2.FindStringSubmatch(s)
 		if len(match) == 3 {
 			hour, err := strconv.Atoi(match[1])
-			if err != nil{
+			if err != nil {
 				return 0, err
 			}
 			minute, err := strconv.Atoi(match[2])
-			if err != nil{
+			if err != nil {
 				return 0, err
 			}
-			t = time.Hour * time.Duration(hour) + time.Minute * time.Duration(minute)
+			t = time.Hour*time.Duration(hour) + time.Minute*time.Duration(minute)
 			return t, nil
 		}
 		return 0, ERR
 
-	}else {
+	} else {
 		match := reg3.FindStringSubmatch(s)
 		if len(match) == 3 {
 			minute, err := strconv.Atoi(match[1])
-			if err != nil{
+			if err != nil {
 				return 0, err
 			}
 			second, err := strconv.Atoi(match[2])
-			if err != nil{
+			if err != nil {
 				return 0, err
 			}
-			t = time.Minute * time.Duration(minute) + time.Second * time.Duration(second)
+			t = time.Minute*time.Duration(minute) + time.Second*time.Duration(second)
 			return t, nil
 		}
 		return 0, ERR

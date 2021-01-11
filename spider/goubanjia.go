@@ -49,16 +49,16 @@ func SpiderGouBanJia() []model.IP {
 				return
 			}
 			minute, err := strconv.Atoi(strings.Split(info[6], "分")[0])
-			if err != nil{
+			if err != nil {
 				logrus.WithFields(logrus.Fields{
-					"err": err,
-					"url": url,
+					"err":         err,
+					"url":         url,
 					"verify-time": info[6],
 				}).Error("want to parse verify time error")
 				return
 			}
 			t := time.Now()
-			t = t.Add(-time.Minute*time.Duration(minute))
+			t = t.Add(-time.Minute * time.Duration(minute))
 			ips = append(ips, model.IP{
 				IP:            ip,
 				Port:          port,

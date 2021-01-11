@@ -7,6 +7,7 @@ import (
 	"github.com/sirupsen/logrus"
 	"net"
 	"strconv"
+	"strings"
 	"time"
 )
 
@@ -23,7 +24,6 @@ func SpiderXiLaDaiLi() []model.IP {
 	c.DetectCharset = true
 	c.UserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.125 Safari/537.36"
 
-
 	c.OnHTML(`table > tbody`, func(e *colly.HTMLElement) {
 		//fmt.Println("爬取第", pageNum, "页")
 		if e.DOM.Find("tr").Index() < 0 {
@@ -38,18 +38,18 @@ func SpiderXiLaDaiLi() []model.IP {
 			ip, port, _ := net.SplitHostPort(info[0])
 
 			speed, err := strconv.ParseFloat(info[4], 64)
-			if err != nil{
+			if err != nil {
 				logrus.WithFields(logrus.Fields{
-					"err": err,
+					"err":   err,
 					"speed": info[4],
 				}).Error("parse response speed error")
 				return
 			}
 
 			t, err := time.Parse("2006年1月2日 15:4", info[6])
-			if err != nil{
+			if err != nil {
 				logrus.WithFields(logrus.Fields{
-					"err": err,
+					"err":         err,
 					"verify-time": info[6],
 				}).Error("parse verify time error")
 				return
@@ -61,14 +61,14 @@ func SpiderXiLaDaiLi() []model.IP {
 				Anonymous:     info[2],
 				Location:      info[3],
 				VerifyTime:    t,
-				Type:          info[1],
+				Type:          strings.ToLower(strings.TrimRight(info[1], "代理")),
 				POST:          true,
 				ResponseSpeed: time.Millisecond * time.Duration(speed*1000),
 			})
 
 		})
 		// 最多爬取40页，自行修改
-		if pageNum > 40{
+		if pageNum > 40 {
 			return
 		}
 		pageNum++
@@ -80,9 +80,7 @@ func SpiderXiLaDaiLi() []model.IP {
 
 		c.Visit(fmt.Sprintf(https, pageNum))
 
-
 	})
-
 
 	c.Visit(fmt.Sprintf(high, pageNum))
 	c.Visit(fmt.Sprintf(http, pageNum))

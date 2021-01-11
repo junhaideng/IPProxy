@@ -7,6 +7,7 @@ import (
 	"github.com/sirupsen/logrus"
 	"net/http"
 	"strconv"
+	"strings"
 	"time"
 )
 
@@ -30,36 +31,36 @@ func SpiderSuperFastIP() []model.IP {
 	var page = 1
 	for {
 		url := fmt.Sprintf("https://api.superfastip.com/ip/freeip?page=%d", page)
-		page ++
+		page++
 		resp, err := http.Get(url)
-		if err != nil{
+		if err != nil {
 			logrus.WithField("url", url).Error("get response error")
 			break
 		}
 		var res Response
 		err = json.NewDecoder(resp.Body).Decode(&res)
-		if err != nil{
+		if err != nil {
 			logrus.WithField("err", err).Error("decode response body error: ")
 			continue
 		}
 		resp.Body.Close()
-		if len(res.FreeIP) == 0{
+		if len(res.FreeIP) == 0 {
 			break
 		}
-		for _, ip := range res.FreeIP{
+		for _, ip := range res.FreeIP {
 			t, err := time.Parse("2006-01-02 15:04:05", ip.VerifyTime)
-			if err != nil{
+			if err != nil {
 				logrus.WithFields(logrus.Fields{
-					"err": err,
+					"err":         err,
 					"verify-time": ip.VerifyTime,
-					"url": url,
+					"url":         url,
 				}).Error("parse time error")
 				continue
 			}
 			speed, err := strconv.ParseFloat(ip.Speed, 64)
-			if err != nil{
+			if err != nil {
 				logrus.WithFields(logrus.Fields{
-					"err": err,
+					"err":   err,
 					"speed": ip.Speed,
 				}).Error("parse ip speed error")
 				continue
@@ -71,7 +72,7 @@ func SpiderSuperFastIP() []model.IP {
 				Anonymous:     ip.Level,
 				Location:      ip.Country,
 				VerifyTime:    t,
-				Type:          ip.Type,
+				Type:          strings.ToLower(strings.Replace(ip.Type, "/", ",", -1)),
 				POST:          true,
 				ResponseSpeed: time.Millisecond * time.Duration(speed*1000),
 			})

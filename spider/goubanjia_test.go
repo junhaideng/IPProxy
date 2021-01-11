@@ -4,6 +4,6 @@ import (
 	"testing"
 )
 
-func TestGouBanJia(t *testing.T){
+func TestGouBanJia(t *testing.T) {
 	SpiderGouBanJia()
 }

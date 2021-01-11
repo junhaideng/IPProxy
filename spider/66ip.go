@@ -8,7 +8,7 @@ import (
 	"time"
 )
 
-func Spider66IP() []model.IP{
+func Spider66IP() []model.IP {
 	var ips []model.IP
 	var url = "http://www.66ip.cn/%d.html"
 	c := colly.NewCollector()
@@ -27,11 +27,11 @@ func Spider66IP() []model.IP{
 			})
 			//fmt.Println(info)
 			t, err := time.Parse("2006年01月02日15时 验证", info[4])
-			if err != nil{
+			if err != nil {
 				logrus.WithFields(logrus.Fields{
-					"err": err,
+					"err":  err,
 					"time": info[4],
-					"url": url,
+					"url":  url,
 				}).Error("parse time error")
 				return
 			}
@@ -40,6 +40,7 @@ func Spider66IP() []model.IP{
 				Port:          info[1],
 				Location:      info[2],
 				Anonymous:     info[3],
+				Type:          "http,https",
 				VerifyTime:    t,
 				POST:          true, // 默认取true
 				ResponseSpeed: -1,
@@ -50,7 +51,6 @@ func Spider66IP() []model.IP{
 		pageNum++
 		c.Visit(fmt.Sprintf(url, pageNum))
 	})
-
 
 	c.Visit(fmt.Sprintf(url, pageNum))
 

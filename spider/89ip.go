@@ -9,7 +9,7 @@ import (
 	"time"
 )
 
-func Spider89IP()[]model.IP {
+func Spider89IP() []model.IP {
 	var ips []model.IP
 	var url = "https://www.89ip.cn/index_%d.html"
 	c := colly.NewCollector()
@@ -20,10 +20,10 @@ func Spider89IP()[]model.IP {
 	c.OnHTML(`div.layui-form > table > tbody`, func(e *colly.HTMLElement) {
 		//fmt.Printf("正在爬取第 %d 页\n", pageNum)
 		// 当前页中没有ip地址
-		if e.DOM.Find("tr").Index()< 0 {
+		if e.DOM.Find("tr").Index() < 0 {
 			//fmt.Println("没有发现ip")
 
-			return 
+			return
 		}
 		e.ForEach("tr", func(i int, element *colly.HTMLElement) {
 			// ip, port, location, verifyTime
@@ -33,11 +33,11 @@ func Spider89IP()[]model.IP {
 			})
 
 			t, err := time.Parse("2006/01/02 15:04:05", info[4])
-			if err != nil{
+			if err != nil {
 				logrus.WithFields(logrus.Fields{
-					"err": err,
+					"err":  err,
 					"time": info[4],
-					"url": url,
+					"url":  url,
 				}).Error("parse time error")
 				return
 			}
@@ -47,6 +47,7 @@ func Spider89IP()[]model.IP {
 				Port:          info[1],
 				Anonymous:     "未知",
 				Location:      info[2],
+				Type:          "http,https",
 				VerifyTime:    t,
 				POST:          true,
 				ResponseSpeed: -1,

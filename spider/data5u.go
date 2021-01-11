@@ -6,7 +6,6 @@ import (
 	"github.com/junhaideng/IPProxy/model"
 )
 
-
 // Deprecated: can not use now 2020/1/9
 // 这里只有20个免费ip地址
 func SpiderData5u() []model.IP {
