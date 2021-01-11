@@ -2,7 +2,6 @@
 package check
 
 import (
-	"fmt"
 	"github.com/junhaideng/IPProxy/dao"
 	"github.com/junhaideng/IPProxy/model"
 	"github.com/sirupsen/logrus"
@@ -94,6 +93,7 @@ func CheckSingleIP(ip model.IP, wg *sync.WaitGroup) {
 	if proxy == nil {
 		return
 	}
+	// 限制同一时间的并发量，太高会导致出现socket缓冲区不够用
 	var limit = make(chan struct{}, 100)
 	var lg sync.WaitGroup
 	for _, p := range proxy{
@@ -116,7 +116,6 @@ func CheckIP(){
 	num := 1
 	for _, ip := range ips{
 		wg.Add(1)
-		fmt.Printf("checking number %d ip: %s:%s\n", num, ip.IP, ip.Port)
 		num ++
 		go CheckSingleIP(ip, &wg)
 	}
