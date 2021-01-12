@@ -36,12 +36,14 @@ func checkIP(proxy func(r *http.Request)(*url.URL, error), ip model.IP, wg *sync
 		logrus.WithFields(logrus.Fields{
 			"err": err,
 		}).Error("build request error")
+		deleteIP(ip)
 		return
 	}
 	time.Sleep(time.Duration(rand.Intn(10))*time.Second)
 	resp, err := client.Do(req)
 	if err != nil {
 		logrus.WithField("err", err).Error("send http request error")
+		deleteIP(ip)
 		return
 	}
 	defer resp.Body.Close()
@@ -57,6 +59,7 @@ func checkIP(proxy func(r *http.Request)(*url.URL, error), ip model.IP, wg *sync
 				"port": ip.Port,
 				"id": ip.ID.Hex(),
 			}).Error("update ip error")
+			deleteIP(ip)
 			return
 		}
 		logrus.WithFields(logrus.Fields{
@@ -66,24 +69,28 @@ func checkIP(proxy func(r *http.Request)(*url.URL, error), ip model.IP, wg *sync
 		}).Info("update ip success")
 	} else {
 		// 这个ip不可用
-		err := dao.Delete(bson.M{
-			"_id": ip.ID.Hex(),
-		})
-		if err != nil{
-			logrus.WithFields(logrus.Fields{
-				"err": err,
-				"ip": ip.IP,
-				"port": ip.Port,
-				"id": ip.ID.Hex(),
-			}).Error("delete ip error")
-			return
-		}
+		deleteIP(ip)
+	}
+}
+
+func deleteIP(ip model.IP){
+	err := dao.Delete(bson.M{
+		"_id": ip.ID.Hex(),
+	})
+	if err != nil{
 		logrus.WithFields(logrus.Fields{
+			"err": err,
 			"ip": ip.IP,
 			"port": ip.Port,
 			"id": ip.ID.Hex(),
-		}).Info("delete ip success")
+		}).Error("delete ip error")
+		return
 	}
+	logrus.WithFields(logrus.Fields{
+		"ip": ip.IP,
+		"port": ip.Port,
+		"id": ip.ID.Hex(),
+	}).Info("delete ip success")
 }
 
 func CheckSingleIP(ip model.IP, wg *sync.WaitGroup) {
