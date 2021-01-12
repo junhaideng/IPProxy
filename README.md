@@ -62,7 +62,10 @@ api:
   host: "127.0.0.1"
   port: "8000"
 ```
-
+请注意设置集合`ip`的索引如下
+```mongodb
+db.ip.createIndex({"ip":1}, {"unique":true})
+```
 
 
 如果需要使用二进制文件比如`proxy_server.exe`，请在与`proxy_server.exe`同目录下新建一个上述格式的配置文件，命名必须为`config.yaml`
