@@ -31,6 +31,9 @@ func SpiderJiangXianLi() []model.IP {
 				info = append(info, strings.TrimSpace(element.Text))
 				return true
 			})
+			if len(info) < 10 {
+				return 
+			}
 			t, err := time.Parse("2006-01-02 15:04:05", info[9])
 			if err != nil {
 				logrus.WithFields(logrus.Fields{
