@@ -74,7 +74,8 @@ db.ip.createIndex({"ip":1}, {"unique":true})
 
 <img src="images/2.png" width=400>
 
-
+## docker 运行
+详见docker分支
 
 #### LICENSE
 
