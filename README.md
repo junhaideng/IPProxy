@@ -74,7 +74,35 @@ db.ip.createIndex({"ip":1}, {"unique":true})
 
 <img src="images/2.png" width=400>
 
+## docker 运行
+配置文件如下, 可拉取docker分支运行
+```yml
+# 数据库配置
+database:
+  mongodb:
+    username: "Edgar"  # 数据库用户名
+    password: "Edgar"  # 密码
+    db: "IP"  # 数据库名称
+    collection: "ip"  # 保存爬取到的ip集合
+    host: mongo # 数据库主机号, 为docker-compose中定义的服务名
+    port: "27017" # 数据库端口
 
+# 日志配置
+log:
+  mode: "console"  # 或者 file，只有设置mode为file的时候filename才生效
+  level: "info" # 或者 debug, trace, warning, error
+  filename: "proxy.log" # 日志文件名
+  max-size: 5  # MB为单位，当文件达到这个大小之后更换另一个日志文件，暂无实现
+
+# 定时任务配置
+schedule:
+  interval: 10  # 以小时为单位，管理定时任务
+
+# 接口配置
+api:
+  host: "0.0.0.0" # 注意这里为0.0.0.0
+  port: "8000"
+```
 
 #### LICENSE
 
