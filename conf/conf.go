@@ -5,7 +5,7 @@ import (
 	"github.com/spf13/viper"
 )
 
-func init() {
+func Init() {
 	fmt.Println("initialize configuration")
 	viper.AddConfigPath("conf")
 	viper.AddConfigPath(".")

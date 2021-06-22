@@ -1,7 +1,6 @@
 package dao
 
 import (
-	_ "github.com/junhaideng/IPProxy/conf"  // 使配置先进行加载
 	"context"
 	"fmt"
 	"github.com/junhaideng/IPProxy/model"
@@ -16,7 +15,7 @@ import (
 var MongoDB *mongo.Collection
 
 // 初始化数据库
-func init() {
+func Init() {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 	username := viper.GetString("database.mongodb.username")

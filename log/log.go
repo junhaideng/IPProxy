@@ -21,7 +21,7 @@ const (
 	FileMode    = "file"
 )
 
-func init() {
+func Init() {
 	fmt.Println("initialize log")
 	level := viper.GetString("log.level")
 	logrus.SetLevel(levelMap[level])
