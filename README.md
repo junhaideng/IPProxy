@@ -29,6 +29,22 @@ type param struct {
 
 <img src="images/1.png" width=500>
 
+```json
+{
+    "num": 100,
+    "sort": {
+        "response_speed": 1,
+        "verify_time": -1
+    },
+    "filter": {
+        "response_speed": {
+            "$lt": 2059000000,
+            "$ne": -1
+        }
+    }
+}
+```
+
 > :star:**强烈建立在使用的时候参数在上述的sort和filter参数进行扩展，以免获取到的IP可用率比较低**
 
 

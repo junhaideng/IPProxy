@@ -20,7 +20,7 @@ type IP struct {
 	// ip地址所在地理位置
 	Location string `bson:"location,omitempty" json:"location,omitempty"`
 	// 上次验证时间
-	VerifyTime time.Time `bson:"verifyTime,omitempty" json:"verify_time,omitempty"`
+	VerifyTime time.Time `bson:"verify_time,omitempty" json:"verify_time,omitempty"`
 	// 代理ip类型，HTTP, HTTPS
 	Type string `bson:"type,omitempty" json:"type,omitempty"`
 	// 是否支持POST请求
