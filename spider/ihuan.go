@@ -46,7 +46,7 @@ func SpiderIHuan() []model.IP {
 				VerifyTime:    time.Time{},
 				Type:          "",
 				POST:          false,
-				ResponseSpeed: 0,
+				ResponseSpeed: -1,
 			})
 		})
 

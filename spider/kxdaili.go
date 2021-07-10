@@ -27,17 +27,6 @@ func SpiderKxDaiLi() []model.IP {
 			element.ForEach("td", func(i int, element *colly.HTMLElement) {
 				info = append(info, element.Text)
 			})
-			temp := strings.Split(info[4], " ")[0]
-			speed, err := strconv.ParseFloat(temp, 64)
-			if err != nil {
-				logrus.WithFields(logrus.Fields{
-					"err":           err,
-					"response-time": info[4],
-					"url":           url,
-				}).Error("parse response time error")
-				return
-			}
-
 			t, err := parseTime(info[6])
 			if err != nil {
 				logrus.WithFields(logrus.Fields{
@@ -56,7 +45,7 @@ func SpiderKxDaiLi() []model.IP {
 				VerifyTime:    time.Now().Add(-t),
 				Type:          strings.ToLower(info[3]),
 				POST:          true,
-				ResponseSpeed: time.Millisecond * time.Duration(speed*1000),
+				ResponseSpeed: -1,
 			})
 		})
 		page++

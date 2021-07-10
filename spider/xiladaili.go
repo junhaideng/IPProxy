@@ -6,7 +6,6 @@ import (
 	"github.com/junhaideng/IPProxy/model"
 	"github.com/sirupsen/logrus"
 	"net"
-	"strconv"
 	"strings"
 	"time"
 )
@@ -37,15 +36,6 @@ func SpiderXiLaDaiLi() []model.IP {
 			})
 			ip, port, _ := net.SplitHostPort(info[0])
 
-			speed, err := strconv.ParseFloat(info[4], 64)
-			if err != nil {
-				logrus.WithFields(logrus.Fields{
-					"err":   err,
-					"speed": info[4],
-				}).Error("parse response speed error")
-				return
-			}
-
 			t, err := time.Parse("2006年1月2日 15:4", info[6])
 			if err != nil {
 				logrus.WithFields(logrus.Fields{
@@ -63,7 +53,7 @@ func SpiderXiLaDaiLi() []model.IP {
 				VerifyTime:    t,
 				Type:          strings.ToLower(strings.TrimRight(info[1], "代理")),
 				POST:          true,
-				ResponseSpeed: time.Millisecond * time.Duration(speed*1000),
+				ResponseSpeed: -1,
 			})
 
 		})

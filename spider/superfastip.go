@@ -6,7 +6,6 @@ import (
 	"github.com/junhaideng/IPProxy/model"
 	"github.com/sirupsen/logrus"
 	"net/http"
-	"strconv"
 	"strings"
 	"time"
 )
@@ -57,14 +56,6 @@ func SpiderSuperFastIP() []model.IP {
 				}).Error("parse time error")
 				continue
 			}
-			speed, err := strconv.ParseFloat(ip.Speed, 64)
-			if err != nil {
-				logrus.WithFields(logrus.Fields{
-					"err":   err,
-					"speed": ip.Speed,
-				}).Error("parse ip speed error")
-				continue
-			}
 
 			ips = append(ips, model.IP{
 				IP:            ip.Ip,
@@ -74,7 +65,7 @@ func SpiderSuperFastIP() []model.IP {
 				VerifyTime:    t,
 				Type:          strings.ToLower(strings.Replace(ip.Type, "/", ",", -1)),
 				POST:          true,
-				ResponseSpeed: time.Millisecond * time.Duration(speed*1000),
+				ResponseSpeed: -1,
 			})
 		}
 	}

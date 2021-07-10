@@ -39,15 +39,6 @@ func SpiderGouBanJia() []model.IP {
 				return
 			}
 
-			speed, err := strconv.ParseFloat(strings.Split(info[5], " ")[0], 64)
-			if err != nil {
-				logrus.WithFields(logrus.Fields{
-					"err":   err,
-					"url":   url,
-					"speed": info[5],
-				}).Error("parse speed error")
-				return
-			}
 			minute, err := strconv.Atoi(strings.Split(info[6], "分")[0])
 			if err != nil {
 				logrus.WithFields(logrus.Fields{
@@ -67,7 +58,7 @@ func SpiderGouBanJia() []model.IP {
 				VerifyTime:    t,
 				Type:          info[2],
 				POST:          true,
-				ResponseSpeed: time.Millisecond * time.Duration(speed*1000),
+				ResponseSpeed: -1,
 			})
 		})
 	})

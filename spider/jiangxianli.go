@@ -5,7 +5,6 @@ import (
 	"github.com/gocolly/colly"
 	"github.com/junhaideng/IPProxy/model"
 	"github.com/sirupsen/logrus"
-	"strconv"
 	"strings"
 	"time"
 )
@@ -43,42 +42,6 @@ func SpiderJiangXianLi() []model.IP {
 				}).Error("parse time error")
 				return
 			}
-			var speed time.Duration
-			tempIndex := strings.Index(info[7], "毫秒")
-			if tempIndex > -1 {
-				s, err := strconv.Atoi(info[7][:tempIndex])
-				if err != nil {
-					logrus.WithFields(logrus.Fields{
-						"err":           err,
-						"response-time": info[7],
-						"url":           url,
-						"type":          "millisecond",
-					}).Error("parse response time error")
-					return
-				}
-				speed = time.Millisecond * time.Duration(s)
-			} else {
-				index := strings.Index(info[7], "秒")
-				if index > -1 {
-					s, err := strconv.ParseFloat(info[7][:index], 64)
-					if err != nil {
-						logrus.WithFields(logrus.Fields{
-							"err":           err,
-							"response-time": info[7],
-							"url":           url,
-							"type":          "second",
-						}).Error("parse response time error")
-						return
-					}
-					speed = time.Millisecond * time.Duration(s*1000)
-				} else {
-					logrus.WithFields(logrus.Fields{
-						"response-time": info[7],
-						"url":           url,
-					}).Error("can not parse response time")
-					return
-				}
-			}
 			ips = append(ips, model.IP{
 				IP:            info[0],
 				Port:          info[1],
@@ -87,7 +50,7 @@ func SpiderJiangXianLi() []model.IP {
 				VerifyTime:    t,
 				Type:          strings.ToLower(info[3]),
 				POST:          true,
-				ResponseSpeed: speed,
+				ResponseSpeed: -1,
 			})
 		})
 
