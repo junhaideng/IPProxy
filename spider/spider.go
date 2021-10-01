@@ -11,8 +11,9 @@ var (
 
 // 注册所有的爬虫
 func init() {
-	var spiders = []func() []model.IP{SpiderXiLaDaiLi, Spider66IP, Spider89IP, SpiderJiangXianLi,
-		SpiderXiLaDaiLi}
+	var spiders = []func() []model.IP{
+		SpiderXiLaDaiLi, Spider66IP, Spider89IP, SpiderJiangXianLi,
+		SpiderXiLaDaiLi, SpiderIHuan}
 
 	for _, s := range spiders {
 		Spiders = append(Spiders, WrapSpider(s))
