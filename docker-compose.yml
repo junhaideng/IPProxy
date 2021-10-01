@@ -1,0 +1,15 @@
+version: "3"
+services: 
+  backend: 
+    restart: always
+    build: 
+      context: .
+      dockerfile: Dockerfile 
+    ports: 
+      - "8000:8000"
+  mongo:
+    image: mongo 
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: Edgar
+      MONGO_INITDB_ROOT_PASSWORD: Edgar
