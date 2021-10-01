@@ -11,5 +11,5 @@ services:
     image: mongo 
     restart: always
     environment:
-      MONGO_INITDB_ROOT_USERNAME: Edgar
-      MONGO_INITDB_ROOT_PASSWORD: Edgar
+      MONGO_INITDB_ROOT_USERNAME: IPProxy 
+      MONGO_INITDB_ROOT_PASSWORD: IPProxy
