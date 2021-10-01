@@ -99,8 +99,9 @@ curl --proxy host:port www.baidu.com
 
 ### docker 运行
 
-详见docker分支
-
+```bash
+docker-compose up 
+```
 #### LICENSE
 
 开源免费使用，本人不承担任何因此造成的法律责任
