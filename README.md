@@ -8,40 +8,37 @@
 - [x] 66免费代理  http://www.66ip.cn/
 - [x] 云代理  ~~http://www.ip3366.net/(不可用)~~
 - [x] 企业级高速HTTP代理平台  ~~http://www.data5u.com/(不可用)~~
-- [x] 极速代理  https://superfastip.com/#/freeip
+- [x] 极速代理  ~~https://superfastip.com/#/freeip~~
 - [x] 开心代理 http://www.kxdaili.com/dailiip.html
 - [x] 西拉代理  http://www.xiladaili.com/
-- [x] 全网代理IP  http://www.goubanjia.com/
-
-
+- [x] 全网代理IP  ~~http://www.goubanjia.com/~~
 
 项目中提供获取IP地址的接口为 POST `/get_ip`，使用的参数如下
 
 ```go
 type param struct {
-	Num int64 `form:"num"`  // 数量
-	Sort bson.M `form:"sort"` // 排序方式，与mongodb中的一致
-	Filter bson.M `form:"filter"`  // 过滤条件，和mongodb的过滤一致
+Num int64 `form:"num"`    // 数量
+Sort bson.M `form:"sort"` // 排序方式，与mongodb中的一致
+Filter bson.M `form:"filter"` // 过滤条件，和mongodb的过滤一致
 }
 ```
 
 使用`Postman`测试如下
 
-<img src="images/1.png" width=500>
+<img src="images/1.png" width=500 alt="Postman">
 
 ```json
 {
-    "num": 100,
-    "sort": {
-        "response_speed": 1,
-        "verify_time": -1
-    },
-    "filter": {
-        "response_speed": {
-            "$lt": 2059000000,
-            "$ne": -1
-        }
+  "num": 100,
+  "sort": {
+    "response_speed": 1,
+    "verify_time": -1
+  },
+  "filter": {
+    "response_speed": {
+      "$ne": -1
     }
+  }
 }
 ```
 
@@ -78,19 +75,30 @@ api:
   host: "127.0.0.1"
   port: "8000"
 ```
+
 请注意设置集合`ip`的索引如下
+
 ```mongodb
 db.ip.createIndex({"ip":1}, {"unique":true})
+db.ip.createIndex({ "response_speed": 1 })
 ```
-
 
 如果需要使用二进制文件比如`proxy_server.exe`，请在与`proxy_server.exe`同目录下新建一个上述格式的配置文件，命名必须为`config.yaml`
 
 如下图格式，然后在当前目录下运行`proxy_server.exe`即可
 
-<img src="images/2.png" width=400>
+<img src="images/2.png" width=400 alt="exe">
 
-## docker 运行
+### 测试
+
+可以使用下面的命令行进行测试
+
+```bash
+curl --proxy host:port www.baidu.com
+```
+
+### docker 运行
+
 详见docker分支
 
 #### LICENSE
