@@ -10,7 +10,7 @@ import (
 	"time"
 )
 
-// 只有一页
+// Deprecated
 func SpiderGouBanJia() []model.IP {
 	var ips []model.IP
 	var url = "http://www.goubanjia.com/"

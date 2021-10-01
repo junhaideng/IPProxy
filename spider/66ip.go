@@ -9,12 +9,16 @@ import (
 )
 
 func Spider66IP() []model.IP {
-	var ips []model.IP
+	const selector = "#main > div.containerbox.boxindex > div.layui-row.layui-col-space15 > div:nth-child(1) > table > tbody"
+	const maxPageNum = 200
+
+	var ips = make([]model.IP, 0, 2000)
 	var url = "http://www.66ip.cn/%d.html"
 	c := colly.NewCollector()
 	c.DetectCharset = true
+
 	var pageNum = 1
-	c.OnHTML("#main > div > div:nth-child(1) > table > tbody", func(e *colly.HTMLElement) {
+	c.OnHTML(selector, func(e *colly.HTMLElement) {
 		//println("正在访问第", pageNum, "页")
 		e.ForEach("tr", func(i int, element *colly.HTMLElement) {
 			if i == 0 {
@@ -49,6 +53,9 @@ func Spider66IP() []model.IP {
 
 		// 继续访问下一页
 		pageNum++
+		if pageNum > maxPageNum {
+			return
+		}
 		c.Visit(fmt.Sprintf(url, pageNum))
 	})
 

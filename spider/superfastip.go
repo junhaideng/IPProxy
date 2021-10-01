@@ -25,6 +25,7 @@ type Info struct {
 	VerifyTime string `json:"verify_time"`
 }
 
+// Deprecated: 似乎在维护，目前死了
 func SpiderSuperFastIP() []model.IP {
 	var ips []model.IP
 	var page = 1

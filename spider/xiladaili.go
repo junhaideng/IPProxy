@@ -11,9 +11,11 @@ import (
 )
 
 func SpiderXiLaDaiLi() []model.IP {
+	const selector = `table > tbody`
+	const maxPageNum = 40
 	var ips []model.IP
 	// 高匿
-	var high = "http://www.xiladaili.com/high/%d/"
+	var high = "http://www.xiladaili.com/goni/%d/"
 	// http代理
 	var http = "http://www.xiladaili.com/http/%d/"
 	// https代理
@@ -23,7 +25,7 @@ func SpiderXiLaDaiLi() []model.IP {
 	c.DetectCharset = true
 	c.UserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.125 Safari/537.36"
 
-	c.OnHTML(`table > tbody`, func(e *colly.HTMLElement) {
+	c.OnHTML(selector, func(e *colly.HTMLElement) {
 		//fmt.Println("爬取第", pageNum, "页")
 		if e.DOM.Find("tr").Index() < 0 {
 			//fmt.Println("没有发现ip")
@@ -57,8 +59,7 @@ func SpiderXiLaDaiLi() []model.IP {
 			})
 
 		})
-		// 最多爬取40页，自行修改
-		if pageNum > 40 {
+		if pageNum > maxPageNum {
 			return
 		}
 		pageNum++

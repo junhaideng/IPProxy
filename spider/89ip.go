@@ -10,14 +10,18 @@ import (
 )
 
 func Spider89IP() []model.IP {
-	var ips []model.IP
+	const selector = "div.layui-form > table > tbody"
+	const maxPageNum = 200
+
+	var ips = make([]model.IP, 0, 2000)
 	var url = "https://www.89ip.cn/index_%d.html"
+
 	c := colly.NewCollector()
 	c.DetectCharset = true
 	c.UserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.125 Safari/537.36"
 
 	pageNum := 1
-	c.OnHTML(`div.layui-form > table > tbody`, func(e *colly.HTMLElement) {
+	c.OnHTML(selector, func(e *colly.HTMLElement) {
 		//fmt.Printf("正在爬取第 %d 页\n", pageNum)
 		// 当前页中没有ip地址
 		if e.DOM.Find("tr").Index() < 0 {
@@ -55,6 +59,9 @@ func Spider89IP() []model.IP {
 		})
 
 		pageNum++
+		if pageNum > maxPageNum {
+			return
+		}
 		c.Visit(fmt.Sprintf(url, pageNum))
 	})
 

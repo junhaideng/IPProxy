@@ -10,6 +10,9 @@ import (
 )
 
 func SpiderJiangXianLi() []model.IP {
+	const selector = `body > div.layui-layout.layui-layout-admin > div.layui-row > div.layui-col-md9.ip-tables > div.layui-form > table > tbody`
+	const maxPageNum = 10
+
 	var ips []model.IP
 	c := colly.NewCollector()
 
@@ -19,7 +22,7 @@ func SpiderJiangXianLi() []model.IP {
 	c.DetectCharset = true
 	c.UserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.125 Safari/537.36"
 
-	c.OnHTML(`body > div.layui-layout.layui-layout-admin > div.layui-row > div.layui-col-md9.ip-tables > div.layui-form > table > tbody`, func(e *colly.HTMLElement) {
+	c.OnHTML(selector, func(e *colly.HTMLElement) {
 		e.ForEach("tr", func(i int, element *colly.HTMLElement) {
 			var info []string
 			element.ForEachWithBreak("td", func(i int, element *colly.HTMLElement) bool {
@@ -31,7 +34,7 @@ func SpiderJiangXianLi() []model.IP {
 				return true
 			})
 			if len(info) < 10 {
-				return 
+				return
 			}
 			t, err := time.Parse("2006-01-02 15:04:05", info[9])
 			if err != nil {
@@ -55,6 +58,9 @@ func SpiderJiangXianLi() []model.IP {
 		})
 
 		pageNum++
+		if pageNum > maxPageNum {
+			return
+		}
 		c.Visit(fmt.Sprintf(url, pageNum))
 	})
 
