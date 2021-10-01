@@ -63,7 +63,7 @@ func GetAll() ([]model.IP, error) {
 
 // 获取到文档
 func GetLimit(limit int64, filter interface{}, sort interface{}) ([]model.IP, error) {
-	if limit <=0{
+	if limit <= 0 {
 		return nil, nil
 	}
 	var ips []model.IP
@@ -72,9 +72,8 @@ func GetLimit(limit int64, filter interface{}, sort interface{}) ([]model.IP, er
 
 	opt := &options.FindOptions{
 		Limit: &limit,
-		Sort: sort,
+		Sort:  sort,
 	}
-
 
 	cursor, err := MongoDB.Find(ctx, filter, opt)
 	if err != nil {
@@ -98,22 +97,22 @@ func Delete(filter interface{}, opts ...*options.DeleteOptions) error {
 }
 
 // ip地址是否已经存在
-func FindByIP(ipaddr string )(*model.IP, error){
+func FindByIP(ipaddr string) (*model.IP, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 	var ip = &model.IP{}
 	result, err := MongoDB.Find(ctx, bson.M{"ip": ipaddr})
-	if err != nil{
+	if err != nil {
 		logrus.WithFields(logrus.Fields{
-			"ip": ipaddr,
+			"ip":  ipaddr,
 			"err": err,
 		}).Error("查找ip地址发生错误")
 		return nil, err
 	}
 	for result.Next(ctx) {
-		if err := result.Decode(ip); err != nil{
+		if err := result.Decode(ip); err != nil {
 			logrus.WithFields(logrus.Fields{
-				"ip": ipaddr,
+				"ip":  ipaddr,
 				"err": err,
 			}).Error("反序列化失败")
 			return nil, err
@@ -125,22 +124,22 @@ func FindByIP(ipaddr string )(*model.IP, error){
 // ip地址是否存在
 func ExistIP(ipaddr string) bool {
 	ip, err := FindByIP(ipaddr)
-	if err != nil{
+	if err != nil {
 		logrus.WithFields(logrus.Fields{
 			"err": err,
-			"ip": ipaddr,
+			"ip":  ipaddr,
 		})
 		return false
 	}
-	if ip.IP != ""{
+	if ip.IP != "" {
 		return true
 	}
 	return false
 }
 
-func Update(filter interface{}, update interface{}, option... *options.UpdateOptions) error{
+func Update(filter interface{}, update interface{}, option ...*options.UpdateOptions) error {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
-	_, err :=  MongoDB.UpdateOne(ctx, filter, update, option...)
+	_, err := MongoDB.UpdateOne(ctx, filter, update, option...)
 	return err
 }

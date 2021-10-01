@@ -1,25 +1,38 @@
-// 该程序可以简单的检查ip是否可用
+// Package check 检查ip是否可用
 package check
 
 import (
 	"github.com/junhaideng/IPProxy/dao"
 	"github.com/junhaideng/IPProxy/model"
+	"github.com/panjf2000/ants/v2"
 	"github.com/sirupsen/logrus"
 	"go.mongodb.org/mongo-driver/bson"
 	"math/rand"
 	"net"
 	"net/http"
 	"net/url"
-	"sync"
 	"time"
 )
 
+var pool *ants.PoolWithFunc
+
+func init() {
+	var err error
+	pool, err = ants.NewPoolWithFunc(100, checkIP)
+	if err != nil {
+		panic(err)
+	}
+}
+
+type Arg struct {
+	Proxy func(r *http.Request) (*url.URL, error)
+	IP    model.IP
+}
+
 // check ip with specified proxy
-func checkIP(proxy func(r *http.Request)(*url.URL, error), ip model.IP, wg *sync.WaitGroup, limit <- chan struct{}){
-	defer func() {
-		wg.Done()
-		<- limit
-	}()
+func checkIP(arg interface{}) {
+	argument := arg.(Arg)
+	proxy, ip := argument.Proxy, argument.IP
 	start := time.Now()
 	var client = http.Client{
 		Transport: &http.Transport{
@@ -39,7 +52,7 @@ func checkIP(proxy func(r *http.Request)(*url.URL, error), ip model.IP, wg *sync
 		deleteIP(ip)
 		return
 	}
-	time.Sleep(time.Duration(rand.Intn(10))*time.Second)
+	time.Sleep(time.Duration(rand.Intn(10)) * time.Second)
 	resp, err := client.Do(req)
 	if err != nil {
 		logrus.WithField("err", err).Error("send http request error")
@@ -51,21 +64,21 @@ func checkIP(proxy func(r *http.Request)(*url.URL, error), ip model.IP, wg *sync
 	if resp.StatusCode == 200 {
 		ip.ResponseSpeed = time.Now().Sub(start)
 		ip.VerifyTime = time.Now()
-		err := dao.Update(bson.M{"_id": ip.ID.Hex()}, bson.M{"$set": bson.M{"response_speed":ip.ResponseSpeed, "verifyTime":ip.VerifyTime}})
-		if err != nil{
+		err := dao.Update(bson.M{"_id": ip.ID}, bson.M{"$set": bson.M{"response_speed": ip.ResponseSpeed, "verifyTime": ip.VerifyTime}})
+		if err != nil {
 			logrus.WithFields(logrus.Fields{
-				"err": err,
-				"ip": ip.IP,
+				"err":  err,
+				"ip":   ip.IP,
 				"port": ip.Port,
-				"id": ip.ID.Hex(),
+				"id":   ip.ID.Hex(),
 			}).Error("update ip error")
 			deleteIP(ip)
 			return
 		}
 		logrus.WithFields(logrus.Fields{
-			"ip": ip.IP,
+			"ip":   ip.IP,
 			"port": ip.Port,
-			"id": ip.ID.Hex(),
+			"id":   ip.ID.Hex(),
 		}).Info("update ip success")
 	} else {
 		// 这个ip不可用
@@ -73,58 +86,48 @@ func checkIP(proxy func(r *http.Request)(*url.URL, error), ip model.IP, wg *sync
 	}
 }
 
-func deleteIP(ip model.IP){
+func deleteIP(ip model.IP) {
 	err := dao.Delete(bson.M{
 		"_id": ip.ID.Hex(),
 	})
-	if err != nil{
+	if err != nil {
 		logrus.WithFields(logrus.Fields{
-			"err": err,
-			"ip": ip.IP,
+			"err":  err,
+			"ip":   ip.IP,
 			"port": ip.Port,
-			"id": ip.ID.Hex(),
+			"id":   ip.ID.Hex(),
 		}).Error("delete ip error")
 		return
 	}
 	logrus.WithFields(logrus.Fields{
-		"ip": ip.IP,
+		"ip":   ip.IP,
 		"port": ip.Port,
-		"id": ip.ID.Hex(),
+		"id":   ip.ID.Hex(),
 	}).Info("delete ip success")
 }
 
-func CheckSingleIP(ip model.IP, wg *sync.WaitGroup) {
-	defer wg.Done()
+func CheckSingleIP(ip model.IP) {
 	proxy := ip.ProxyURL()
 
 	if proxy == nil {
 		return
 	}
-	// 限制同一时间的并发量，太高会导致出现socket缓冲区不够用
-	var limit = make(chan struct{}, 100)
-	var lg sync.WaitGroup
-	for _, p := range proxy{
-		lg.Add(1)
-		limit <- struct{}{}
-		go checkIP(p, ip, &lg, limit)
+	for _, p := range proxy {
+		err := pool.Invoke(Arg{p, ip})
+		if err != nil {
+			logrus.Error(err)
+			continue
+		}
 	}
-	lg.Wait()
-	
 }
 
-
-func CheckIP(){
+func CheckIP() {
 	ips, err := dao.GetAll()
-	var wg sync.WaitGroup
-	if err != nil{
+	if err != nil {
 		logrus.WithField("err", err).Error("get all ips error")
 		return
 	}
-	num := 1
-	for _, ip := range ips{
-		wg.Add(1)
-		num ++
-		go CheckSingleIP(ip, &wg)
+	for _, ip := range ips {
+		CheckSingleIP(ip)
 	}
-	wg.Wait()
 }

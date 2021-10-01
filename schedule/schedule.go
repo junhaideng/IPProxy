@@ -10,24 +10,22 @@ import (
 	"time"
 )
 
-type Status string 
+type Status string
 
 const (
-	Idle Status = "idle"
+	Idle    Status = "idle"
 	Running Status = "running"
-	Stop Status = "stop"
+	Stop    Status = "stop"
 )
 
-
-type Scheduler interface{
+type Scheduler interface {
 	// 开始进行运行
-	Start() error 
+	Start() error
 	// 停止所有爬虫
-	Stop() error 
+	Stop() error
 	// 返回当前状态
 	Status() Status
 }
-
 
 type ProxySchedule struct {
 	// 所有注册的爬虫
@@ -44,10 +42,10 @@ func (p *ProxySchedule) Start() error {
 	defer p.m.Unlock()
 	p.status = Running
 	interval := viper.GetUint64("schedule.interval")
-	for index, s := range p.spiders{
+	for index, s := range p.spiders {
 		logrus.Infof("start number %d spider", index)
 		_, err := p.s.Every(interval).Minute().Do(s.Start)
-		if err != nil{
+		if err != nil {
 			logrus.WithFields(logrus.Fields{
 				"err": err,
 			}).Errorf("start number %d spider error", index)
@@ -55,8 +53,8 @@ func (p *ProxySchedule) Start() error {
 	}
 
 	// 每interval*len(spiders)分钟进行另一次ip的检测
-	_, err := p.s.Every(interval*uint64(len(p.spiders))).Minute().Do(check.CheckIP)
-	if err != nil{
+	_, err := p.s.Every(interval * uint64(len(p.spiders))).Minute().Do(check.CheckIP)
+	if err != nil {
 		logrus.WithFields(logrus.Fields{
 			"err": err,
 		}).Error("check ip err")
@@ -67,7 +65,7 @@ func (p *ProxySchedule) Start() error {
 	return nil
 }
 
-func (p *ProxySchedule)Status() Status {
+func (p *ProxySchedule) Status() Status {
 	p.m.RLock()
 	defer p.m.RUnlock()
 	return p.status
@@ -78,31 +76,31 @@ func (p *ProxySchedule) Stop() error {
 	defer p.m.Unlock()
 	p.status = Stop
 	p.s.Stop()
-	return  nil
+	return nil
 }
 
 func NewScheduler() *ProxySchedule {
 	return &ProxySchedule{
-		s: gocron.NewScheduler(time.UTC),
-		status:  Idle,
+		s:      gocron.NewScheduler(time.UTC),
+		status: Idle,
 	}
 }
 
-func (p *ProxySchedule) Register(s spider.Spider)error {
+func (p *ProxySchedule) Register(s spider.Spider) error {
 	p.m.Lock()
 	defer p.m.Unlock()
 	p.spiders = append(p.spiders, s)
 	return nil
 }
 
-func (p *ProxySchedule) Unregister(s spider.Spider)error {
+func (p *ProxySchedule) Unregister(s spider.Spider) error {
 	p.m.Lock()
 	defer p.m.Unlock()
 	p.spiders = append(p.spiders, s)
 	return nil
 }
 
-func (p *ProxySchedule) Clear()error {
+func (p *ProxySchedule) Clear() error {
 	p.m.Lock()
 	defer p.m.Unlock()
 	p.s.Clear()

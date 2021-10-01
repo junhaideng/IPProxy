@@ -29,14 +29,14 @@ type IP struct {
 	ResponseSpeed time.Duration `bson:"response_speed,omitempty" json:"response_speed,omitempty"`
 }
 
-func(ip IP) URL() ([]*url.URL, error){
+func (ip IP) URL() ([]*url.URL, error) {
 	if ip.Type == "" {
 		ip.Type = "http"
 	}
 	typs := strings.Split(ip.Type, ",")
 	var uris []*url.URL
 	var e error
-	for _, typ := range typs{
+	for _, typ := range typs {
 		uri, err := url.Parse(typ + "://" + ip.IP + ":" + ip.Port)
 		if err != nil {
 			logrus.WithFields(logrus.Fields{
@@ -55,15 +55,15 @@ func(ip IP) URL() ([]*url.URL, error){
 
 func (ip IP) ProxyURL() []func(r *http.Request) (*url.URL, error) {
 	uris, err := ip.URL()
-	if err != nil{
+	if err != nil {
 		logrus.WithFields(logrus.Fields{
 			"err": err,
 			"uri": uris,
 		}).Error("创建代理ip错误")
 		return nil
 	}
-	var fs []func(r *http.Request)(*url.URL, error)
-	for _, uri := range uris{
+	var fs []func(r *http.Request) (*url.URL, error)
+	for _, uri := range uris {
 		fs = append(fs, http.ProxyURL(uri))
 	}
 	return fs
